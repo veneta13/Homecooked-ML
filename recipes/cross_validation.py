@@ -1,18 +1,20 @@
 import numpy as np
-from numpy import mean
-
+import random
 
 def cross_validate(X, y, model, k=10):
     def cross_validation_split(X, k):
         num_samples = len(X)
         fold_size = num_samples // k
 
+        indices = list(range(num_samples))
+        random.shuffle(indices)
+
         for i in range(k):
             start = i * fold_size
             end = start + fold_size
 
-            validation_index = list(range(start, end))
-            train_index = [idx for idx in range(num_samples) if idx not in validation_index]
+            validation_index = indices[start:end]
+            train_index = [idx for idx in indices if idx not in validation_index]
 
             yield train_index, validation_index
 
@@ -28,4 +30,4 @@ def cross_validate(X, y, model, k=10):
         accuracy = np.mean(y_pred == y_val)
         accuracies.append(accuracy)
 
-    return accuracies, mean(accuracies)
+    return accuracies, np.mean(accuracies)
