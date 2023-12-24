@@ -1,6 +1,7 @@
 import numpy as np
 import random
 
+
 def cross_validate(X, y, model, k=10):
     def cross_validation_split(X, k):
         num_samples = len(X)
