@@ -18,6 +18,9 @@ def silhouette(X, labels):
             if cluster_label == labels[other_idx] and current_idx != other_idx:
                 intra_distances.append(euclidean_distance(X.iloc[current_idx], X.iloc[other_idx]))
 
+        if len(intra_distances) == 0:
+            silhouette_scores[current_idx] = 0.0
+            continue
         avg_intra_distances = np.mean(intra_distances)
 
         for current_label in set(labels):
@@ -31,6 +34,9 @@ def silhouette(X, labels):
                 )
                 min_inter_distance = min(min_inter_distance, current_inter_distance)
 
+        if min_inter_distance == np.inf:
+            silhouette_scores[current_idx] = 0.0
+            continue
         silhouette_scores[current_idx] = (min_inter_distance - avg_intra_distances) / max(avg_intra_distances,
                                                                                           min_inter_distance)
 
