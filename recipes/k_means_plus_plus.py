@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class KMeans:
+class KMeansPlusPlus:
     def __init__(self, k, max_iterations=10_000):
         self.k = k
         self.max_iterations = max_iterations
@@ -16,9 +16,21 @@ class KMeans:
         return label
 
     def __initialize_centroids__(self, X):
-        xs = np.random.uniform(low=np.min(X['x']), high=np.max(X['x']), size=self.k)
-        ys = np.random.uniform(low=np.min(X['y']), high=np.max(X['y']), size=self.k)
-        self.centroids = np.array([xs, ys]).T
+        self.centroids = np.array(X.sample(n=1))
+
+        for i in range(self.k - 1):
+            points = []
+            min_distances = []
+
+            for _, point in X.iterrows():
+                if not any([all(same) for same in [np.array(point) == centroid for centroid in self.centroids]]):
+                    points.append(np.array(point))
+                    min_distances.append(np.min(self.__calculate_distances__(np.array(point))))
+
+            probs = np.array(min_distances) / np.sum(np.array(min_distances))
+            new_centroid_idx = np.random.choice(len(points), 1, p=probs)[0]
+            new_centroid = points[new_centroid_idx].reshape([1, 2])
+            self.centroids = np.append(self.centroids, new_centroid, axis=0)
 
     def __calculate_distances__(self, point):
         distances = np.sqrt(np.sum((point - self.centroids) ** 2, axis=1))
@@ -28,8 +40,7 @@ class KMeans:
         self.labels = [self.__label__(np.array(row)) for _, row in X.iterrows()]
 
     def __update_centroids__(self, X):
-        new_centroids = np.array([np.mean(X.iloc[np.array(self.labels) == i], axis=0) for i in range(self.k)])
-        return new_centroids
+        return np.array([np.mean(X.iloc[np.array(self.labels) == i], axis=0) for i in range(self.k)])
 
     def fit(self, X):
         self.__initialize_centroids__(X)
