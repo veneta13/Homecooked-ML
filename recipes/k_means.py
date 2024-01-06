@@ -20,10 +20,6 @@ class KMeans:
         ys = np.random.uniform(low=np.min(X['y']), high=np.max(X['y']), size=self.k)
         self.centroids = np.array([xs, ys]).T
 
-    def __calculate_distances__(self, point):
-        distances = np.sqrt(np.sum((point - self.centroids) ** 2, axis=1))
-        return distances
-
     def __assign_labels__(self, X):
         self.labels = [self.__label__(np.array(row)) for _, row in X.iterrows()]
 
